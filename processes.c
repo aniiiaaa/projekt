@@ -13,6 +13,20 @@
 #include "struct.h"
 #include "log_ipc.h"
 
+static void wait_sale_close_same_course(int id_s, dane *d, int kurs_local){
+    int kurs_now;
+    int koniec;
+
+    lock(id_s);
+    kurs_now = d->kurs;
+    koniec = d->koniec;
+    unlock(id_s);
+
+    if(!koniec && kurs_now == kurs_local){
+        (void)sem_wait_zero(id_s, SEM_SALE);
+    }
+}
+
 static void L(int logid, const char* fmt, ...){
     if(logid < 0) return;
     char buf[LOG_TEXT_MAX];
