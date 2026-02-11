@@ -243,10 +243,10 @@ int main(void){
     set_handler(SIGALRM, on_tick);
     start_timer_1s();
 
-    key_t k_shm = ftok("src/main.c", 'A');
-    key_t k_sem = ftok("src/main.c", 'B');
-    key_t k_msg = ftok("src/main.c", 'C');
-    key_t k_log = ftok("src/main.c", 'L');
+    key_t k_shm = ftok("main.c", 'A');
+    key_t k_sem = ftok("main.c", 'B');
+    key_t k_msg = ftok("main.c", 'C');
+    key_t k_log = ftok("main.c", 'L');
     if(k_shm == -1 || k_sem == -1 || k_msg == -1 || k_log == -1){
         perror("ftok");
         exit(1);
