@@ -239,7 +239,7 @@ void kasa(int id_s, dane *d, int msgid, int logid){
 
         if(zamknieta || kasa_koniec || bus == 0){
             msg_send_resp(msgid, req.nr, 0, kurs_local);
-            evt_signal(id_s);
+        
             continue;
         }
 
@@ -283,7 +283,7 @@ void kasa(int id_s, dane *d, int msgid, int logid){
 
         // OK — “zgoda” na próbę wejścia
         msg_send_resp(msgid, req.nr, 1, kurs_local);
-        evt_signal(id_s);
+ 
     }
 }
 
@@ -362,7 +362,7 @@ void pasazer(int nr, int id_s, dane *d, int msgid, int logid){
             req.czy_vip = 0;
 
             ring_send(id_s, d, &req);
-            evt_signal(id_s);
+   
 
             odpowiedz_kasy ans;
             if(!msg_wait_resp(msgid, nr, &ans)){
@@ -371,7 +371,7 @@ void pasazer(int nr, int id_s, dane *d, int msgid, int logid){
 
             if(ans.ok == 0){
                 
-
+ wait_sale_close_same_course(id_s, d, kurs_local);
                 if(potrzebne_m == 1){
                     lock(id_s);
                     if(d->czeka_1 > 0) d->czeka_1 -= 1;
@@ -407,7 +407,9 @@ void pasazer(int nr, int id_s, dane *d, int msgid, int logid){
         unlock(id_s);
 
         if(!zarezerwowane){
-           
+           // wyścig/restrykcje zasobów w bieżącym kursie: czekaj na zamknięcie sprzedaży
+            // i ponów próbę dopiero w kolejnym kursie (bez sleep/busy-wait)
+            wait_sale_close_same_course(id_s, d, kurs_local);
             continue;
         }
 
@@ -434,7 +436,7 @@ void pasazer(int nr, int id_s, dane *d, int msgid, int logid){
 
         signal_wejscie(id_s, wej);
         if(budz) signal_driver(id_s);
-        evt_signal(id_s);
+
 
         L(logid, "[PAS %d] wszedl (kurs=%d vip=%d rower=%d dziecko=%d) -> exit",
           nr, kurs_local, vip, rower, dziecko);
