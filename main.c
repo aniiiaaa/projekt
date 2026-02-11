@@ -361,9 +361,9 @@ int main(void){
     // PARENT loop
     while(1){
         int status;
-        pid_t w;
+        pid_t w = waitpid(-1, &status, 0);
 
-        while((w = waitpid(-1, &status, WNOHANG)) > 0){
+        if(w > 0){{
             mark_dead(w);
 
             if(is_pas_pid(w)){
@@ -373,7 +373,15 @@ int main(void){
                 if(pas_alive == 0 && !finish_requested){
                     request_finish_all();
                     finish_requested = 1;
-                    break;
+                    } else if(w == -1) {
+            if(errno == EINTR){
+                // sygnał SIGALRM/SIGINT/SIGTERM: obsługa niżej
+            } else if(errno == ECHILD){
+                break;
+            } else {
+                perror("waitpid");
+                break;
+            }
                 }
             }
         }
@@ -405,7 +413,7 @@ int main(void){
             }
         }
 
-        pause();
+      
     }
 
     // po request_finish_all(): poczekaj aż wszystkie dzieci same wyjdą
