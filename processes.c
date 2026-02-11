@@ -325,8 +325,7 @@ void pasazer(int nr, int id_s, dane *d, int msgid, int logid){
         unlock(id_s);
 
         if(bus == 0 || kasa_koniec == 1){
-            (void)sem_wait_zero(id_s, SEM_SALE);
-
+           
             if(potrzebne_m == 1){
                 lock(id_s);
                 if(d->czeka_1 > 0) d->czeka_1 -= 1;
@@ -334,7 +333,7 @@ void pasazer(int nr, int id_s, dane *d, int msgid, int logid){
             }
             zarejestrowany_kurs = -1;
 
-            evt_signal(id_s);
+           
             continue;
         }
 
@@ -357,7 +356,7 @@ void pasazer(int nr, int id_s, dane *d, int msgid, int logid){
             }
 
             if(ans.ok == 0){
-                (void)sem_wait_zero(id_s, SEM_SALE);
+                
 
                 if(potrzebne_m == 1){
                     lock(id_s);
@@ -366,7 +365,7 @@ void pasazer(int nr, int id_s, dane *d, int msgid, int logid){
                 }
                 zarejestrowany_kurs = -1;
 
-                evt_signal(id_s);
+              
                 continue;
             }
         }
@@ -394,16 +393,7 @@ void pasazer(int nr, int id_s, dane *d, int msgid, int logid){
         unlock(id_s);
 
         if(!zarezerwowane){
-            (void)sem_wait_zero(id_s, SEM_SALE);
-
-            if(potrzebne_m == 1){
-                lock(id_s);
-                if(d->czeka_1 > 0) d->czeka_1 -= 1;
-                unlock(id_s);
-            }
-            zarejestrowany_kurs = -1;
-
-            evt_signal(id_s);
+           
             continue;
         }
 
